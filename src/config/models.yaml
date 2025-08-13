@@ -1,0 +1,61 @@
+# src/config/models.yaml
+
+# Toucan Models
+toucan_base:
+  model_name: "UBC-NLP/toucan-base"
+  model_class: "MT5ForConditionalGeneration"
+  torch_dtype: "float16"
+  device_map: "auto"
+  max_input_length: 1024
+  generation_config:
+    num_beams: 5
+    do_sample: true
+    temperature: 0.6
+    top_p: 0.9
+    max_new_tokens: 256
+
+toucan_1.2B:
+  model_name: "UBC-NLP/toucan-1.2B"
+  model_class: "MT5ForConditionalGeneration"
+  torch_dtype: "float16"
+  device_map: "auto"
+  max_input_length: 1024
+  generation_config:
+    num_beams: 5
+    do_sample: true
+    temperature: 0.6
+    top_p: 0.9
+    max_new_tokens: 256
+
+# NLLB Models
+nllb_200_distilled_600M:
+  model_name: "facebook/nllb-200-distilled-600M"
+  model_class: "auto"
+  torch_dtype: "float16"
+  device_map: "auto"
+  max_input_length: 1024
+  generation_config:
+    num_beams: 4
+    max_new_tokens: 256
+  lang_code_map:
+    eng: "eng_Latn"
+    swa: "swa_Latn"
+    fra: "fra_Latn"
+    kin: "kin_Latn"
+    fon: "fon_Latn"
+
+nllb_200_3.3B:
+  model_name: "facebook/nllb-200-3.3B"
+  model_class: "auto"
+  torch_dtype: "float16"
+  device_map: "auto"
+  max_input_length: 1024
+  generation_config:
+    num_beams: 4
+    max_new_tokens: 256
+  lang_code_map:
+    eng: "eng_Latn"
+    swa: "swa_Latn"
+    fra: "fra_Latn"
+    kin: "kin_Latn"
+    fon: "fon_Latn"
