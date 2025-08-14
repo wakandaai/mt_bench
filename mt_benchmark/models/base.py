@@ -1,4 +1,4 @@
-# src/models/base.py
+# mt_benchmark/models/base.py
 
 from abc import ABC, abstractmethod
 from typing import List, Dict

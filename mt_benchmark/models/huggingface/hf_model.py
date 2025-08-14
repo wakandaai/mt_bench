@@ -1,8 +1,8 @@
-# src/models/huggingface/local.py
+# mt_benchmark/models/huggingface/local.py
 from typing import List, Dict, Optional, Any
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, MT5ForConditionalGeneration
-from ..base import BaseTranslationModel
+from mt_benchmark.models.base import BaseTranslationModel
 
 class HuggingFaceModel(BaseTranslationModel):
     """Base class for local HuggingFace models."""

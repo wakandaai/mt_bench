@@ -1,7 +1,7 @@
 # Example usage of unified API models via DSPy
-from src.models.factory import ModelFactory
-from src.datasets.flores import FloresDataset
-from src.evaluation.pipeline import EvaluationPipeline
+from mt_benchmark.models.factory import ModelFactory
+from mt_benchmark.datasets.flores import FloresDataset
+from mt_benchmark.evaluation.pipeline import EvaluationPipeline
 
 # Load dataset
 dataset = FloresDataset("FLORES_PLUS/devtest")

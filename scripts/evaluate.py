@@ -1,7 +1,7 @@
 # Example usage of the evaluation pipeline
-from src.models.factory import ModelFactory
-from src.datasets.flores import FloresDataset
-from src.evaluation.pipeline import EvaluationPipeline
+from mt_benchmark.models.factory import ModelFactory
+from mt_benchmark.datasets.flores import FloresDataset
+from mt_benchmark.evaluation.pipeline import EvaluationPipeline
 
 # Load models and dataset
 toucan_model = ModelFactory.create_model('toucan_1.2B')

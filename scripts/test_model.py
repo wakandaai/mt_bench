@@ -1,4 +1,4 @@
-from src.models.factory import ModelFactory
+from mt_benchmark.models.factory import ModelFactory
 
 # Create Toucan model
 toucan_model = ModelFactory.create_model('toucan_1.2B')

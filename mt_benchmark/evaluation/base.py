@@ -1,8 +1,8 @@
-# src/evaluation/base.py
+# mt_benchmark/evaluation/base.py
 
 from dataclasses import dataclass
 from typing import Dict, List, Any, Optional
-from ..datasets.base import TranslationSample
+from mt_benchmark.datasets.base import TranslationSample
 
 @dataclass
 class PredictionResult:

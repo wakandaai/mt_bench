@@ -1,10 +1,10 @@
-# src/models/factory.py
+# mt_benchmark/models/factory.py
 import yaml
 from typing import Dict, Any
 from pathlib import Path
-from .base import BaseTranslationModel
-from .huggingface.hf_model import ToucanModel, NLLBModel
-from .api_services.base import DSPyAPIModel
+from mt_benchmark.models.base import BaseTranslationModel
+from mt_benchmark.models.huggingface.hf_model import ToucanModel, NLLBModel
+from mt_benchmark.models.api_services.base import DSPyAPIModel
 
 class ModelFactory:
     """Factory for creating translation models."""

@@ -1,8 +1,8 @@
-# src/evaluation/metrics.py
+# mt_benchmark/evaluation/metrics.py
 
 import sacrebleu
 from typing import List, Dict, Any
-from .base import CorpusMetrics
+from mt_benchmark.evaluation.base import CorpusMetrics
 
 class MetricsCalculator:
     """Calculator for corpus-level translation metrics."""

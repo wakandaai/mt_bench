@@ -1,4 +1,4 @@
-# src/evaluation/pipeline.py
+# mt_benchmark/evaluation/pipeline.py
 import time
 import csv
 import json
@@ -6,10 +6,10 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 from tqdm import tqdm
 
-from ..models.base import BaseTranslationModel
-from ..datasets.base import BaseDataset, LanguagePair
-from .base import PredictionResult, EvaluationResult
-from .metrics import MetricsCalculator
+from mt_benchmark.models.base import BaseTranslationModel
+from mt_benchmark.datasets.base import BaseDataset, LanguagePair
+from mt_benchmark.evaluation.base import PredictionResult, EvaluationResult
+from mt_benchmark.evaluation.metrics import MetricsCalculator
 
 class EvaluationPipeline:
     """Main evaluation pipeline for translation models."""

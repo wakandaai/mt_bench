@@ -1,8 +1,8 @@
-# src/models/api_services/base.py
+# mt_benchmark/models/api_services/base.py
 import dspy
 import time
 from typing import List, Dict, Any
-from ..base import BaseTranslationModel
+from mt_benchmark.models.base import BaseTranslationModel
 
 class TranslationSignature(dspy.Signature):
     """Translate text from source language to target language using provided language codes."""
@@ -57,7 +57,7 @@ class DSPyAPIModel(BaseTranslationModel):
                     source_lang=source_lang,
                     target_lang=target_lang
                 )
-                dspy.inspect_history(n=1)
+                print(dspy.inspect_history(n=1))
                 translations.append(result.translation)
                 
                 # Add small delay to respect rate limits

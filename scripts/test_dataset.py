@@ -1,5 +1,5 @@
 # Example usage of the FLORES dataset
-from src.datasets.flores import FloresDataset
+from mt_benchmark.datasets.flores import FloresDataset
 
 # Load dataset
 dataset = FloresDataset("FLORES_PLUS/dev")

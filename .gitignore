@@ -2,3 +2,5 @@
 *.pyc
 FLORES_PLUS
 results/
+build/
+*.out

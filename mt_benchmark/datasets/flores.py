@@ -1,9 +1,9 @@
-# src/datasets/flores.py
+# mt_benchmark/datasets/flores.py
 import os
 import csv
 from pathlib import Path
 from typing import List, Dict, Any, Set
-from .base import BaseDataset, TranslationSample, LanguagePair
+from mt_benchmark.datasets.base import BaseDataset, TranslationSample, LanguagePair
 
 class FloresDataset(BaseDataset):
     """FLORES dataset loader for preprocessed CSV files."""
