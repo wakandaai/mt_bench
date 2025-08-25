@@ -4,3 +4,4 @@ FLORES_PLUS
 results/
 build/
 *.out
+credentials.json

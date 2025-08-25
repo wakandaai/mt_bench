@@ -4,7 +4,7 @@ from typing import Dict, Any
 from pathlib import Path
 from mt_benchmark.models.base import BaseTranslationModel
 from mt_benchmark.models.huggingface.hf_model import ToucanModel, NLLBModel
-from mt_benchmark.models.api_services.base import DSPyAPIModel
+from mt_benchmark.models.api_services.base import DSPyAPIModel, GoogleTranslateModel
 
 class ModelFactory:
     """Factory for creating translation models."""
@@ -13,6 +13,7 @@ class ModelFactory:
         'toucan': ToucanModel,
         'nllb': NLLBModel,
         'api': DSPyAPIModel,
+        'google_cloud_translate': GoogleTranslateModel,
     }
     
     @classmethod
@@ -20,7 +21,7 @@ class ModelFactory:
         """Create a model instance from configuration.
         
         Args:
-            model_id: Model identifier from config (e.g., 'toucan_base', 'gpt4o_mini')
+            model_id: Model identifier from config (e.g., 'toucan_base', 'gpt4o_mini', 'google_translate')
             config_path: Path to models.yaml config file
             
         Returns:
@@ -39,7 +40,11 @@ class ModelFactory:
         model_config = config[model_id]
         
         # Determine model type
-        if 'model' in model_config:
+        if 'type' in model_config:
+            # Explicit type specified (e.g., Google Cloud Translate)
+            model_type = model_config['type']
+            model_name = model_id
+        elif 'model' in model_config:
             # API model (has DSPy model string)
             model_type = 'api'
             model_name = model_config['model']

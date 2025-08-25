@@ -6,25 +6,46 @@ from mt_benchmark.evaluation.pipeline import EvaluationPipeline
 # Load dataset
 dataset = FloresDataset("FLORES_PLUS/devtest")
 
-# Create any API models using DSPy's unified interface
-gpt5_model = ModelFactory.create_model('gpt-5-nano')
+# Create any models
+gpt_model = ModelFactory.create_model('gpt-5-nano')
 
 # Create evaluation pipeline
 evaluator = EvaluationPipeline(
     output_dir="results",
-    batch_size=1  # API models process one at a time
+    batch_size=16
 )
 
 # Evaluate any model - same interface!
-print("Evaluating GPT-5")
-gpt5_results = evaluator.evaluate_model_on_pair(
-    model=gpt5_model,
+print("Evaluating google cloud translate")
+
+gpt_results = evaluator.evaluate_model_on_pair(
+    model=gpt_model,
     dataset=dataset,
-    source_lang="eng",
+    source_lang="fra",
+    target_lang="kin",
+    experiment_name="gpt5"
+)
+
+gpt_results = evaluator.evaluate_model_on_pair(
+    model=gpt_model,
+    dataset=dataset,
+    source_lang="kin",
+    target_lang="fra",
+    experiment_name="gpt5"
+)
+
+gpt_results = evaluator.evaluate_model_on_pair(
+    model=gpt_model,
+    dataset=dataset,
+    source_lang="fra",
     target_lang="swa",
     experiment_name="gpt5"
 )
 
-# Same evaluation interface for everything!
-print("Results:")
-print(f"GPT-5 BLEU: {gpt5_results.corpus_metrics.bleu:.2f}")
+gpt_results = evaluator.evaluate_model_on_pair(
+    model=gpt_model,
+    dataset=dataset,
+    source_lang="swa",
+    target_lang="fra",
+    experiment_name="gpt5"
+)
