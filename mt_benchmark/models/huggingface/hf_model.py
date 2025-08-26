@@ -1,7 +1,7 @@
 # mt_benchmark/models/huggingface/local.py
 from typing import List, Dict, Optional, Any
 import torch
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, MT5ForConditionalGeneration
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoProcessor, MT5ForConditionalGeneration, SeamlessM4Tv2Model, T5Tokenizer
 from mt_benchmark.models.base import BaseTranslationModel
 
 class HuggingFaceModel(BaseTranslationModel):
@@ -12,6 +12,7 @@ class HuggingFaceModel(BaseTranslationModel):
         self.config = model_config
         self.model = None
         self.tokenizer = None
+        self.processor = None
         self._load_model()
     
     def _load_model(self):
@@ -21,9 +22,6 @@ class HuggingFaceModel(BaseTranslationModel):
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
-        # Load tokenizer
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        
         # Load model with specified parameters
         model_kwargs = {
             'torch_dtype': getattr(torch, self.config.get('torch_dtype', 'float32')),
@@ -32,9 +30,14 @@ class HuggingFaceModel(BaseTranslationModel):
         
         if model_class == 'MT5ForConditionalGeneration':
             self.model = MT5ForConditionalGeneration.from_pretrained(self.model_name, **model_kwargs)
+            self.tokenizer = T5Tokenizer.from_pretrained(self.model_name)
+        elif model_class == 'SeamlessM4Tv2Model':
+            self.model = SeamlessM4Tv2Model.from_pretrained(self.model_name, **model_kwargs)
+            self.processor = AutoProcessor.from_pretrained(self.model_name)
         else:
             self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name, **model_kwargs)
-        
+            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+
         self.model.eval()
     
     def translate(self, texts: List[str], source_lang: str, target_lang: str) -> List[str]:
@@ -107,6 +110,55 @@ class ToucanModel(HuggingFaceModel):
         """Format input with target language prefix for Toucan."""
         return f"{target_lang}: {text}"
 
+class SeamlessModel(HuggingFaceModel):
+    """Seamless M4T-V2 model implementation."""
+    
+    def __init__(self, model_name: str, model_config: Dict[str, Any]):
+        # Seamless language code mapping
+        self.lang_code_map = model_config.get('lang_code_map', {})
+        super().__init__(model_name, model_config)
+
+    def translate(self, texts: List[str], source_lang: str, target_lang: str) -> List[str]:
+        """Translate with Seamless-specific language handling."""
+        if not self.processor:
+            raise RuntimeError("Processor not loaded for SeamlessModel")
+
+        # Map language codes if mapping provided
+        src_lang_code = self.lang_code_map.get(source_lang, source_lang)
+        tgt_lang_code = self.lang_code_map.get(target_lang, target_lang)
+        
+        try:
+            text_inputs = self.processor(
+                text=texts,
+                src_lang=src_lang_code,
+                return_tensors="pt"
+            )
+            
+            # Move to device
+            text_inputs = {k: v.to(self.device) for k, v in text_inputs.items() if isinstance(v, torch.Tensor)}
+            
+            # Generate
+            with torch.no_grad():
+                output_tokens = self.model.generate(
+                    **text_inputs,
+                    tgt_lang=tgt_lang_code,
+                    generate_speech=False
+                )
+            
+            # Decode
+            translated_text = self.processor.batch_decode(
+                output_tokens[0].tolist(),
+                skip_special_tokens=True
+            )
+            
+            return [self._postprocess_output(trans) for trans in translated_text]
+            
+        except Exception as e:
+            print(f"SeamlessM4T translation error: {e}")
+            import traceback
+            traceback.print_exc()
+            return [""] * len(texts)  # Return empty translations for all texts
+
 
 class NLLBModel(HuggingFaceModel):
     """NLLB model implementation."""
@@ -159,5 +211,7 @@ class NLLBModel(HuggingFaceModel):
             generated_ids,
             skip_special_tokens=True
         )
+
+
         
         return [self._postprocess_output(trans) for trans in translations]

@@ -3,7 +3,7 @@ import yaml
 from typing import Dict, Any
 from pathlib import Path
 from mt_benchmark.models.base import BaseTranslationModel
-from mt_benchmark.models.huggingface.hf_model import ToucanModel, NLLBModel
+from mt_benchmark.models.huggingface.hf_model import ToucanModel, NLLBModel, SeamlessModel
 from mt_benchmark.models.api_services.base import DSPyAPIModel, GoogleTranslateModel
 
 class ModelFactory:
@@ -12,6 +12,7 @@ class ModelFactory:
     _model_registry = {
         'toucan': ToucanModel,
         'nllb': NLLBModel,
+        'seamless': SeamlessModel,
         'api': DSPyAPIModel,
         'google_cloud_translate': GoogleTranslateModel,
     }
@@ -67,6 +68,8 @@ class ModelFactory:
             return 'toucan'
         elif 'nllb' in model_id.lower() or 'nllb' in model_name.lower():
             return 'nllb'
+        elif 'seamless' in model_id.lower() or 'm4t' in model_name.lower():
+            return 'seamless'
         else:
             raise ValueError(f"Cannot determine model type for {model_id} / {model_name}")
     

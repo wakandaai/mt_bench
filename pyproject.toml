@@ -31,7 +31,8 @@ dependencies = [
     "sacrebleu==2.5.1",
     "tqdm==4.67.1",
     "dspy==3.0.0",
-    "google-cloud-translate==3.21.1"
+    "google-cloud-translate==3.21.1",
+    "sentencepiece==0.2.1"
 ]
 
 
