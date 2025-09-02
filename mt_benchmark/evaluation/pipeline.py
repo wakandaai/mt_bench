@@ -18,7 +18,8 @@ class EvaluationPipeline:
                  output_dir: str = "results",
                  batch_size: int = 1,
                  bleu_config: Dict[str, Any] = None,
-                 chrf_config: Dict[str, Any] = None):
+                 chrf_config: Dict[str, Any] = None,
+                 skip_unsupported: bool = True):
         """Initialize evaluation pipeline.
         
         Args:
@@ -26,11 +27,13 @@ class EvaluationPipeline:
             batch_size: Default batch size for predictions
             bleu_config: Configuration for BLEU metric
             chrf_config: Configuration for chrF++ metric
+            skip_unsupported: Set false to force evals for unsupported langs
         """
         self.output_dir = Path(output_dir)
         self.batch_size = batch_size
         self.metrics_calculator = MetricsCalculator(bleu_config, chrf_config)
-    
+        self.skip_unsupported = skip_unsupported
+
     def evaluate_model_on_pair(self,
                               model: BaseTranslationModel,
                               dataset: BaseDataset,
@@ -51,6 +54,13 @@ class EvaluationPipeline:
         Returns:
             EvaluationResult object
         """
+
+        # Check language pair support
+        if self.skip_unsupported:
+            if not model.supports_language_pair(source_lang, target_lang):
+                print(f"⏭️  Skipping {source_lang}→{target_lang}: Not supported by model")
+                return None
+
         print(f"Evaluating {model.get_model_info()['model_name']} on {source_lang}→{target_lang}")
         
         # Get samples for the language pair

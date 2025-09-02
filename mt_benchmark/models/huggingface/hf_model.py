@@ -215,12 +215,7 @@ class SeamlessModel(HuggingFaceModel):
     def supports_language_pair(self, source_lang: str, target_lang: str) -> bool:
         """Check if Seamless supports this language pair."""
         supported = self.get_supported_languages()
-        
-        # Extract base language codes
-        src_base = source_lang.split('_')[0] + '_' + source_lang.split('_')[1] if '_' in source_lang else source_lang
-        tgt_base = target_lang.split('_')[0] + '_' + target_lang.split('_')[1] if '_' in target_lang else target_lang
-        
-        return src_base in supported and tgt_base in supported
+        return source_lang in supported and target_lang in supported
 
 
 class NLLBModel(HuggingFaceModel):
