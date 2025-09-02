@@ -1,7 +1,7 @@
 # mt_benchmark/models/base.py
 
 from abc import ABC, abstractmethod
-from typing import List, Dict
+from typing import List, Dict, Set
 
 class BaseTranslationModel(ABC):
     @abstractmethod
@@ -34,5 +34,27 @@ class BaseTranslationModel(ABC):
         
         Returns:
             True if batch processing is supported
+        """
+        pass
+
+    @abstractmethod
+    def get_supported_languages(self) -> Dict[str, Dict[str, str]]:
+        """Get set of language codes supported by this model. 
+        
+        Returns:
+            Dict of format {'language_code': {'name': 'language_name'}}
+        """
+        pass
+
+    @abstractmethod
+    def supports_language_pair(self, source_lang: str, target_lang: str) -> bool:
+        """Check if model supports translating between language pair.
+        
+        Args:
+            source_lang: Source language code
+            target_lang: Target language code
+            
+        Returns:
+            True if language pair is supported
         """
         pass

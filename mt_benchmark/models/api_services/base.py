@@ -5,6 +5,7 @@ from typing import List, Dict, Any, Optional, Set
 from mt_benchmark.models.base import BaseTranslationModel
 from google.cloud import translate_v2 as translate
 from google.api_core import exceptions as google_exceptions
+from mt_benchmark.config.language_support.code_mapping import iso639_1_to_iso639_3_and_script
 
 class TranslationSignature(dspy.Signature):
     """Translate text from source language to target language using provided language codes."""
@@ -120,14 +121,18 @@ class GoogleTranslateModel(BaseTranslationModel):
         """Load and cache supported languages from Google Translate."""
         try:
             languages = self.translate_client.get_languages()
-            self._supported_languages = {lang['language'] for lang in languages}
+            self._supported_languages = {(lang['language']): {'name': lang['name']} for lang in languages}
             print(f"Google Translate supports {len(self._supported_languages)} languages")
         except Exception as e:
             print(f"Warning: Could not fetch supported languages: {e}")
-            self._supported_languages = set()
+            self._supported_languages = {}
     
     def get_supported_languages(self) -> Set[str]:
-        """Get set of language codes supported by Google Translate."""
+        """Get set of language codes supported by Google Translate.
+        
+            Returns:
+            Dict of format {'language_code': {'name': 'language_name'}}
+        """
         if self._supported_languages is None:
             self._load_supported_languages()
         return self._supported_languages.copy()

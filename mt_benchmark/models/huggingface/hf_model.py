@@ -3,6 +3,9 @@ from typing import List, Dict, Optional, Any
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoProcessor, MT5ForConditionalGeneration, SeamlessM4Tv2Model, T5Tokenizer
 from mt_benchmark.models.base import BaseTranslationModel
+from mt_benchmark.config.language_support.nllb import nllb_languages_supported
+from mt_benchmark.config.language_support.seamless import seamless_languages_supported
+from mt_benchmark.config.language_support.toucan import toucan_languages_supported, TOUCAN_TO_FLORES_MAPPING
 
 class HuggingFaceModel(BaseTranslationModel):
     """Base class for local HuggingFace models."""
@@ -110,6 +113,13 @@ class ToucanModel(HuggingFaceModel):
         """Format input with target language prefix for Toucan."""
         return f"{target_lang}: {text}"
 
+    def get_supported_languages(self) -> Dict[str, Dict[str, str]]:
+        """Get supported languages for Toucan.
+            Returns:
+            Dict of format {'language_code': {'name': 'language_name'}}
+        """
+        return toucan_languages_supported()
+
 class SeamlessModel(HuggingFaceModel):
     """Seamless M4T-V2 model implementation."""
     
@@ -156,6 +166,13 @@ class SeamlessModel(HuggingFaceModel):
             import traceback
             traceback.print_exc()
             return [""] * len(texts)  # Return empty translations for all texts
+        
+    def get_supported_languages(self) -> Dict[str, Dict[str, str]]:
+        """Get supported languages for Seamless.
+            Returns:
+            Dict of format {'language_code': {'name': 'language_name'}}
+        """
+        return seamless_languages_supported()
 
 
 class NLLBModel(HuggingFaceModel):
@@ -208,6 +225,11 @@ class NLLBModel(HuggingFaceModel):
             skip_special_tokens=True
         )
 
-
-        
         return [self._postprocess_output(trans) for trans in translations]
+
+    def get_supported_languages(self) -> Dict[str, Dict[str, str]]:
+        """Get supported languages for NLLB
+            Returns:
+            Dict of format {'language_code': {'name': 'language_name'}}
+        """
+        return nllb_languages_supported()
