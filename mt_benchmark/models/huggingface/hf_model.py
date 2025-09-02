@@ -1,4 +1,4 @@
-# mt_benchmark/models/huggingface/local.py
+# mt_benchmark/models/huggingface/hf_model.py
 from typing import List, Dict, Optional, Any
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoProcessor, MT5ForConditionalGeneration, SeamlessM4Tv2Model, T5Tokenizer
@@ -16,7 +16,9 @@ class HuggingFaceModel(BaseTranslationModel):
         self.model = None
         self.tokenizer = None
         self.processor = None
+        self._supported_languages = None
         self._load_model()
+        self._load_supported_languages()
     
     def _load_model(self):
         """Load the model and tokenizer based on configuration."""
@@ -42,6 +44,10 @@ class HuggingFaceModel(BaseTranslationModel):
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
 
         self.model.eval()
+    
+    def _load_supported_languages(self):
+        """Load supported languages. Must be implemented by subclasses."""
+        self._supported_languages = {}
     
     def translate(self, texts: List[str], source_lang: str, target_lang: str) -> List[str]:
         """Translate texts using the loaded model."""
@@ -101,6 +107,17 @@ class HuggingFaceModel(BaseTranslationModel):
             'dtype': str(next(self.model.parameters()).dtype)
         }
     
+    def get_supported_languages(self) -> Dict[str, Dict[str, str]]:
+        """Get supported languages. Must be implemented by subclasses."""
+        if self._supported_languages is None:
+            self._load_supported_languages()
+        return self._supported_languages.copy()
+    
+    def supports_language_pair(self, source_lang: str, target_lang: str) -> bool:
+        """Check if model supports translating between language pair."""
+        supported = self.get_supported_languages()
+        return source_lang in supported and target_lang in supported
+    
     @property
     def supports_batch(self) -> bool:
         return True
@@ -109,22 +126,50 @@ class HuggingFaceModel(BaseTranslationModel):
 class ToucanModel(HuggingFaceModel):
     """Toucan model implementation."""
     
+    def _load_supported_languages(self):
+        """Load Toucan supported languages."""
+        self._supported_languages = toucan_languages_supported()
+    
     def _format_input(self, text: str, source_lang: str, target_lang: str) -> str:
         """Format input with target language prefix for Toucan."""
-        return f"{target_lang}: {text}"
+        # Convert from FLORES format to Toucan format if needed
+        target_code = target_lang
+        if target_lang in TOUCAN_TO_FLORES_MAPPING.values():
+            # Reverse lookup to find toucan code
+            for toucan_code, flores_code in TOUCAN_TO_FLORES_MAPPING.items():
+                if flores_code == target_lang:
+                    target_code = toucan_code.split('_')[0]  # Get just the language part
+                    break
+        else:
+            # Use the base language code
+            target_code = target_lang.split('_')[0]
+        
+        return f"{target_code}: {text}"
 
-    def get_supported_languages(self) -> Dict[str, Dict[str, str]]:
-        """Get supported languages for Toucan.
-            Returns:
-            Dict of format {'language_code': {'name': 'language_name'}}
-        """
-        return toucan_languages_supported()
+    def supports_language_pair(self, source_lang: str, target_lang: str) -> bool:
+        """Check if Toucan supports this language pair."""
+        supported = self.get_supported_languages()
+        
+        # Check direct support
+        if source_lang in supported and target_lang in supported:
+            return True
+        
+        # Check with FLORES mapping
+        flores_source = TOUCAN_TO_FLORES_MAPPING.get(source_lang, source_lang)
+        flores_target = TOUCAN_TO_FLORES_MAPPING.get(target_lang, target_lang)
+        
+        return flores_source in supported and flores_target in supported
+
 
 class SeamlessModel(HuggingFaceModel):
     """Seamless M4T-V2 model implementation."""
     
     def __init__(self, model_name: str, model_config: Dict[str, Any]):
         super().__init__(model_name, model_config)
+    
+    def _load_supported_languages(self):
+        """Load Seamless supported languages."""
+        self._supported_languages = seamless_languages_supported()
 
     def translate(self, texts: List[str], source_lang: str, target_lang: str) -> List[str]:
         """Translate with Seamless-specific language handling."""
@@ -166,13 +211,16 @@ class SeamlessModel(HuggingFaceModel):
             import traceback
             traceback.print_exc()
             return [""] * len(texts)  # Return empty translations for all texts
+
+    def supports_language_pair(self, source_lang: str, target_lang: str) -> bool:
+        """Check if Seamless supports this language pair."""
+        supported = self.get_supported_languages()
         
-    def get_supported_languages(self) -> Dict[str, Dict[str, str]]:
-        """Get supported languages for Seamless.
-            Returns:
-            Dict of format {'language_code': {'name': 'language_name'}}
-        """
-        return seamless_languages_supported()
+        # Extract base language codes
+        src_base = source_lang.split('_')[0] + '_' + source_lang.split('_')[1] if '_' in source_lang else source_lang
+        tgt_base = target_lang.split('_')[0] + '_' + target_lang.split('_')[1] if '_' in target_lang else target_lang
+        
+        return src_base in supported and tgt_base in supported
 
 
 class NLLBModel(HuggingFaceModel):
@@ -180,6 +228,10 @@ class NLLBModel(HuggingFaceModel):
     
     def __init__(self, model_name: str, model_config: Dict[str, Any]):
         super().__init__(model_name, model_config)
+    
+    def _load_supported_languages(self):
+        """Load NLLB supported languages."""
+        self._supported_languages = nllb_languages_supported()
     
     def _format_input(self, text: str, source_lang: str, target_lang: str) -> str:
         """NLLB uses language codes in tokenizer, handled during tokenization."""
@@ -227,9 +279,7 @@ class NLLBModel(HuggingFaceModel):
 
         return [self._postprocess_output(trans) for trans in translations]
 
-    def get_supported_languages(self) -> Dict[str, Dict[str, str]]:
-        """Get supported languages for NLLB
-            Returns:
-            Dict of format {'language_code': {'name': 'language_name'}}
-        """
-        return nllb_languages_supported()
+    def supports_language_pair(self, source_lang: str, target_lang: str) -> bool:
+        """Check if NLLB supports this language pair."""
+        supported = self.get_supported_languages()
+        return source_lang in supported and target_lang in supported

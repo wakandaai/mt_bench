@@ -20,6 +20,7 @@ def main():
             print("No supported languages found.", file=sys.stderr)
             sys.exit(1)
 
+        print(f"Number of languages supported: {len(supported_languages)}")
         print("Supported languages:")
         for lang in supported_languages:
             print(f" - {lang}: {supported_languages[lang]['name']}")

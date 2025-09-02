@@ -146,20 +146,22 @@ class GoogleTranslateModel(BaseTranslationModel):
                 return None  # Explicitly marked as unsupported
             return mapped_code
         
-        # Try direct mapping (e.g., 'eng' -> 'en', 'fra' -> 'fr')
-        if len(lang_code) == 3:
-            # Common ISO 639-3 to ISO 639-1 mappings
-            iso_639_3_to_1 = {
-                'eng': 'en', 'fra': 'fr',
-                'swa': 'sw', 'kin': 'rw'
-            }
-            
-            if lang_code in iso_639_3_to_1:
-                return iso_639_3_to_1[lang_code]
+        # Handle FLORES format codes (e.g., 'eng_Latn' -> 'eng')
+        if '_' in lang_code:
+            base_code = lang_code.split('_')[0]
+        else:
+            base_code = lang_code
+        
+        # Try using the existing mapping utility
+        from mt_benchmark.config.language_support.code_mapping import iso639_3_to_iso639_1
+        iso_mapping = iso639_3_to_iso639_1()
+        
+        if base_code in iso_mapping:
+            return iso_mapping[base_code]
         
         # Return as-is if already 2 characters (ISO 639-1)
-        if len(lang_code) == 2:
-            return lang_code
+        if len(base_code) == 2:
+            return base_code
             
         return None  # Unable to map
     
@@ -176,6 +178,11 @@ class GoogleTranslateModel(BaseTranslationModel):
             return None, None
             
         return src_mapped, tgt_mapped
+    
+    def supports_language_pair(self, source_lang: str, target_lang: str) -> bool:
+        """Check if Google Translate supports this language pair."""
+        src_mapped, tgt_mapped = self._check_language_support(source_lang, target_lang)
+        return src_mapped is not None and tgt_mapped is not None
     
     def translate(self, texts: List[str], source_lang: str, target_lang: str) -> List[str]:
         """Translate a list of texts.

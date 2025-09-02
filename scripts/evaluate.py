@@ -8,7 +8,7 @@ from mt_benchmark.evaluation.pipeline import EvaluationPipeline
 def main():
     parser = argparse.ArgumentParser(description='Machine Translation Evaluation Pipeline')
     parser.add_argument('model_id', help='Model ID (e.g., nllb_200_3.3B)')
-    parser.add_argument('dataset_id', default='FLORES_PLUS/devtest',
+    parser.add_argument('--dataset_id', default='FLORES_PLUS/devtest',
                         help='Dataset ID (e.g., FLORES_PLUS/devtest)')
     parser.add_argument('--single-pair', action='store_true', 
                        help='Evaluate on single language pair instead of full dataset')
