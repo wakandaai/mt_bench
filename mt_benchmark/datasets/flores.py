@@ -1,5 +1,5 @@
 # mt_benchmark/datasets/flores.py
-import os
+from tqdm import tqdm
 import csv
 from pathlib import Path
 from typing import List, Dict, Any, Set
@@ -26,21 +26,21 @@ class FloresDataset(BaseDataset):
         
         for csv_file in self.dataset_path.glob("*.csv"):
             filename = csv_file.stem
-            if "_" in filename:
-                source_lang, target_lang = filename.split("_", 1)
+            if "-" in filename:
+                source_lang, target_lang = filename.split("-", 1)
                 self.available_files.append((source_lang, target_lang, csv_file))
                 self.language_codes.add(source_lang)
                 self.language_codes.add(target_lang)
     
     def _load_all_data(self):
         """Load all CSV files into memory."""
-        for source_lang, target_lang, csv_file in self.available_files:
+        for source_lang, target_lang, csv_file in tqdm(self.available_files, desc="Loading data"):
             # Load forward direction
-            forward_key = f"{source_lang}_{target_lang}"
+            forward_key = f"{source_lang}-{target_lang}"
             self.data_cache[forward_key] = self._load_csv_file(csv_file, source_lang, target_lang)
             
             # Load reverse direction (swap columns)
-            reverse_key = f"{target_lang}_{source_lang}"
+            reverse_key = f"{target_lang}-{source_lang}"
             self.data_cache[reverse_key] = self._load_csv_file(csv_file, target_lang, source_lang, reverse=True)
     
     def _load_csv_file(self, csv_file: Path, source_lang: str, target_lang: str, 
@@ -80,7 +80,7 @@ class FloresDataset(BaseDataset):
     
     def get_language_pair(self, source_lang: str, target_lang: str) -> List[TranslationSample]:
         """Get all samples for a specific language pair."""
-        pair_key = f"{source_lang}_{target_lang}"
+        pair_key = f"{source_lang}-{target_lang}"
         
         if pair_key not in self.data_cache:
             raise ValueError(f"Language pair {source_lang}→{target_lang} not available. "
@@ -92,7 +92,7 @@ class FloresDataset(BaseDataset):
         """List all available language pairs including both directions."""
         pairs = []
         for pair_key in self.data_cache.keys():
-            source_lang, target_lang = pair_key.split("_", 1)
+            source_lang, target_lang = pair_key.split("-", 1)
             pairs.append(LanguagePair(source_lang, target_lang))
         return pairs
     
@@ -125,5 +125,5 @@ class FloresDataset(BaseDataset):
     
     def has_language_pair(self, source_lang: str, target_lang: str) -> bool:
         """Check if a language pair is available."""
-        pair_key = f"{source_lang}_{target_lang}"
+        pair_key = f"{source_lang}-{target_lang}"
         return pair_key in self.data_cache

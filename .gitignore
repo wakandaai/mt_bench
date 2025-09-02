@@ -1,7 +1,8 @@
 *.egg-info/
 *.pyc
 FLORES_PLUS
-results/
+*results/
 build/
 *.out
 credentials.json
+*.sh

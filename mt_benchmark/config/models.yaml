@@ -38,8 +38,6 @@ seamless_m4t_v2:
   generation_config:
     num_beams: 5
     max_new_tokens: 256
-  lang_code_map:
-    swa: "swh"
 
 # NLLB Models
 nllb_200_distilled_600M:
@@ -51,12 +49,6 @@ nllb_200_distilled_600M:
   generation_config:
     num_beams: 4
     max_new_tokens: 256
-  lang_code_map:
-    eng: "eng_Latn"
-    swa: "swh_Latn"
-    fra: "fra_Latn"
-    kin: "kin_Latn"
-    fon: "fon_Latn"
 
 nllb_200_3.3B:
   model_name: "facebook/nllb-200-3.3B"
@@ -67,12 +59,6 @@ nllb_200_3.3B:
   generation_config:
     num_beams: 4
     max_new_tokens: 256
-  lang_code_map:
-    eng: "eng_Latn"
-    swa: "swh_Latn"
-    fra: "fra_Latn"
-    kin: "kin_Latn"
-    fon: "fon_Latn"
 
 # API Models (using DSPy unified interface)
 gpt-5:

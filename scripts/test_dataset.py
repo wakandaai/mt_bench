@@ -12,17 +12,17 @@ print(f"Total pairs: {info['total_pairs_with_reverse']}")
 print(f"Available pairs: {info['available_pairs'][:5]}...")  # Show first 5
 
 # Get specific language pair
-eng_dik_samples = dataset.get_language_pair("eng", "dik")
+eng_dik_samples = dataset.get_language_pair("eng_Latn", "dik_Latn")
 print(f"\neng→dik samples: {len(eng_dik_samples)}")
 print(f"First sample: {eng_dik_samples[0].source_text[:50]}... → {eng_dik_samples[0].target_text[:50]}...")
 
 # Get reverse direction
-dik_eng_samples = dataset.get_language_pair("dik", "eng")
+dik_eng_samples = dataset.get_language_pair("dik_Latn", "eng_Latn")
 print(f"dik→eng samples: {len(dik_eng_samples)}")
 
 # Batch processing
 print("\nBatch processing example:")
-for i, batch in enumerate(dataset.get_language_pair_batch("eng", "dik", batch_size=2)):
+for i, batch in enumerate(dataset.get_language_pair_batch("eng_Latn", "dik_Latn", batch_size=2)):
     print(f"Batch {i+1}: {len(batch)} samples")
     if i >= 2:  # Show first 3 batches
         break
@@ -32,8 +32,8 @@ all_data = dataset.get_all_pairs_data()
 print(f"\nTotal language pair combinations: {len(all_data)}")
 
 # Check specific pair availability
-print(f"Has eng→fra: {dataset.has_language_pair('eng', 'fra')}")
-print(f"Has swc→yor: {dataset.has_language_pair('swc', 'yor')}")
+print(f"Has eng→fra: {dataset.has_language_pair('eng_Latn', 'fra_Latn')}")
+print(f"Has swc→yor: {dataset.has_language_pair('swc_Latn', 'yor_Latn')}")
 
 # List all available pairs
 print(f"\nFirst 10 available pairs:")

@@ -114,8 +114,6 @@ class SeamlessModel(HuggingFaceModel):
     """Seamless M4T-V2 model implementation."""
     
     def __init__(self, model_name: str, model_config: Dict[str, Any]):
-        # Seamless language code mapping
-        self.lang_code_map = model_config.get('lang_code_map', {})
         super().__init__(model_name, model_config)
 
     def translate(self, texts: List[str], source_lang: str, target_lang: str) -> List[str]:
@@ -123,10 +121,10 @@ class SeamlessModel(HuggingFaceModel):
         if not self.processor:
             raise RuntimeError("Processor not loaded for SeamlessModel")
 
-        # Map language codes if mapping provided
-        src_lang_code = self.lang_code_map.get(source_lang, source_lang)
-        tgt_lang_code = self.lang_code_map.get(target_lang, target_lang)
-        
+        # Map language codes to seamless format: ISO-639-3 codes only
+        src_lang_code = source_lang.split('_')[0]
+        tgt_lang_code = target_lang.split('_')[0]
+
         try:
             text_inputs = self.processor(
                 text=texts,
@@ -164,8 +162,6 @@ class NLLBModel(HuggingFaceModel):
     """NLLB model implementation."""
     
     def __init__(self, model_name: str, model_config: Dict[str, Any]):
-        # NLLB language code mapping
-        self.lang_code_map = model_config.get('lang_code_map', {})
         super().__init__(model_name, model_config)
     
     def _format_input(self, text: str, source_lang: str, target_lang: str) -> str:
@@ -175,9 +171,9 @@ class NLLBModel(HuggingFaceModel):
     def translate(self, texts: List[str], source_lang: str, target_lang: str) -> List[str]:
         """Translate with NLLB-specific language handling."""
         # Map language codes if mapping provided
-        src_lang_code = self.lang_code_map.get(source_lang, source_lang)
-        tgt_lang_code = self.lang_code_map.get(target_lang, target_lang)
-        
+        src_lang_code = source_lang
+        tgt_lang_code = target_lang
+
         # Set source language for tokenizer
         if hasattr(self.tokenizer, 'src_lang'):
             self.tokenizer.src_lang = src_lang_code
