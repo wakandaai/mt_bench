@@ -40,7 +40,7 @@ class EvaluationPipeline:
                               source_lang: str,
                               target_lang: str,
                               experiment_name: str,
-                              batch_size: Optional[int] = None) -> EvaluationResult:
+                              batch_size: Optional[int] = None) -> Optional[EvaluationResult]:
         """Evaluate a model on a specific language pair.
         
         Args:
@@ -52,7 +52,7 @@ class EvaluationPipeline:
             batch_size: Batch size for predictions (overrides default)
             
         Returns:
-            EvaluationResult object
+            EvaluationResult object or None if skipped
         """
 
         # Check language pair support
@@ -109,7 +109,7 @@ class EvaluationPipeline:
             batch_size: Batch size for predictions
             
         Returns:
-            List of EvaluationResult objects
+            List of EvaluationResult objects (excluding None/skipped results)
         """
         model_name = model.get_model_info()['model_name']
         language_pairs = dataset.list_language_pairs()
@@ -123,13 +123,16 @@ class EvaluationPipeline:
                     model, dataset, pair.source_lang, pair.target_lang, 
                     experiment_name, batch_size
                 )
-                results.append(result)
+                # Only append non-None results (i.e., results that weren't skipped)
+                if result is not None:
+                    results.append(result)
             except Exception as e:
                 print(f"  Error evaluating {pair}: {e}")
                 continue
     
-        # Save summary
-        self._save_experiment_summary(results, experiment_name)
+        # Save summary (only for non-None results)
+        if results:  # Only save summary if we have results
+            self._save_experiment_summary(results, experiment_name)
         return results
     
     def _generate_predictions(self,
