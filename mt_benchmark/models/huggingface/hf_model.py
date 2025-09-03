@@ -1,7 +1,7 @@
 # mt_benchmark/models/huggingface/hf_model.py
 from typing import List, Dict, Optional, Any
 import torch
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoProcessor, MT5ForConditionalGeneration, SeamlessM4Tv2Model, T5Tokenizer
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoProcessor, M2M100ForConditionalGeneration, MT5ForConditionalGeneration, NllbTokenizerFast, SeamlessM4Tv2Model, T5Tokenizer
 from mt_benchmark.models.base import BaseTranslationModel
 from mt_benchmark.config.language_support.nllb import nllb_languages_supported
 from mt_benchmark.config.language_support.seamless import seamless_languages_supported
@@ -39,6 +39,9 @@ class HuggingFaceModel(BaseTranslationModel):
         elif model_class == 'SeamlessM4Tv2Model':
             self.model = SeamlessM4Tv2Model.from_pretrained(self.model_name, **model_kwargs)
             self.processor = AutoProcessor.from_pretrained(self.model_name)
+        elif model_class == 'NllbModel':
+            self.model = M2M100ForConditionalGeneration.from_pretrained(self.model_name, **model_kwargs)
+            self.tokenizer = NllbTokenizerFast.from_pretrained(self.model_name)
         else:
             self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name, **model_kwargs)
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
@@ -234,15 +237,8 @@ class NLLBModel(HuggingFaceModel):
     
     def translate(self, texts: List[str], source_lang: str, target_lang: str) -> List[str]:
         """Translate with NLLB-specific language handling."""
-        # Map language codes if mapping provided
-        src_lang_code = source_lang
         tgt_lang_code = target_lang
-
-        # Set source language for tokenizer
-        if hasattr(self.tokenizer, 'src_lang'):
-            self.tokenizer.src_lang = src_lang_code
-        
-        # Tokenize
+        self.tokenizer.src_lang = source_lang
         inputs = self.tokenizer(
             texts,
             return_tensors="pt",
@@ -259,9 +255,8 @@ class NLLBModel(HuggingFaceModel):
         generation_config = self._get_generation_config(texts)
         
         # Set target language token
-        if hasattr(self.tokenizer, 'lang_code_to_id'):
-            forced_bos_token_id = self.tokenizer.lang_code_to_id[tgt_lang_code]
-            generation_config['forced_bos_token_id'] = forced_bos_token_id
+        forced_bos_token_id = self.tokenizer.convert_tokens_to_ids(tgt_lang_code)
+        generation_config['forced_bos_token_id'] = forced_bos_token_id
         
         with torch.no_grad():
             generated_ids = self.model.generate(**inputs, **generation_config)

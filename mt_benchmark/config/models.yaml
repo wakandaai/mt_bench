@@ -42,7 +42,7 @@ seamless_m4t_v2:
 # NLLB Models
 nllb_200_distilled_600M:
   model_name: "facebook/nllb-200-distilled-600M"
-  model_class: "auto"
+  model_class: "NllbModel"
   torch_dtype: "float16"
   device_map: "auto"
   max_input_length: 1024
@@ -52,7 +52,7 @@ nllb_200_distilled_600M:
 
 nllb_200_3.3B:
   model_name: "facebook/nllb-200-3.3B"
-  model_class: "auto"
+  model_class: "NllbModel"
   torch_dtype: "float16"
   device_map: "auto"
   max_input_length: 1024
