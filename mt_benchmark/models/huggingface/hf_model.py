@@ -237,8 +237,18 @@ class NLLBModel(HuggingFaceModel):
     
     def translate(self, texts: List[str], source_lang: str, target_lang: str) -> List[str]:
         """Translate with NLLB-specific language handling."""
-        tgt_lang_code = target_lang
-        self.tokenizer.src_lang = source_lang
+
+        # handle language codes, if they have glottocodes, remove it for example:
+        # twi_Latn_akua1239 -> twi_Latn
+        if (len(source_lang.split('_')) == 3):
+            source_lang_code = '_'.join(source_lang.split('_')[:2])
+        else:
+            source_lang_code = source_lang
+        if (len(target_lang.split('_')) == 3):
+            tgt_lang_code = '_'.join(target_lang.split('_')[:2])
+        else:
+            tgt_lang_code = target_lang
+        self.tokenizer.src_lang = source_lang_code
         inputs = self.tokenizer(
             texts,
             return_tensors="pt",
