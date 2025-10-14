@@ -122,6 +122,11 @@ for source_lang, target_lang in language_pairs:
     print(f"{source_lang}→{target_lang}: BLEU={result.corpus_metrics.bleu:.2f}")
 ```
 
+```
+sample code to evaluate the models
+python3 evaluate.py toucan_1.2B --single-pair --source-lang eng_Latn --target-lang kin_Latn
+```
+
 ## Configuration
 
 ### Model Configuration

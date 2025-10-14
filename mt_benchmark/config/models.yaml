@@ -101,12 +101,6 @@ madlad400_7b:
     max_new_tokens: 256
 
 
-
-
-
-
-
-
 # API Models (using DSPy unified interface)
 gpt-5:
   model: "openai/gpt-5"
