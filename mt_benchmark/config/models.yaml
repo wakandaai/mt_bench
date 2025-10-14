@@ -84,12 +84,13 @@ afrite_v2_large:
     do_sample: true
     temperature: 0.6
     top_p: 0.9
-    max_new_tokens: 256
+    max_new_tokens: 256p 
 
 
 madlad400_7b: 
-  model_name: "jbochi/madlad400-7b-mt"
+  model_name: "google/madlad400-7b-mt-bt"
   model_class: "MT5ForConditionalGeneration"
+  model_type: "seq2seq"  # Add this line!
   torch_dtype: "float16"
   device_map: "auto"
   max_input_length: 1024

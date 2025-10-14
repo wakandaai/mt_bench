@@ -52,7 +52,7 @@ class ModelFactory:
         else:
             # HuggingFace model
             model_name = model_config['model_name']
-            model_type = cls._get_model_type(model_id, model_name)
+            model_type = cls._get_model_type(model_id, model_name, model_config)
         
         if model_type not in cls._model_registry:
             raise ValueError(f"Unsupported model type: {model_type}")
@@ -62,14 +62,48 @@ class ModelFactory:
         return model_class(model_name, model_config)
     
     @classmethod
-    def _get_model_type(cls, model_id: str, model_name: str) -> str:
-        """Determine model type from model_id or model_name."""
+    def _get_model_type(cls, model_id: str, model_name: str, model_config: Dict[str, Any] = None) -> str:
+        """Determine model type from model_id, model_name, or config."""
+        
+        # First check if model_type is explicitly specified in config
+        if model_config and 'model_type' in model_config:
+            model_type = model_config['model_type']
+            # Map generic types to specific handlers
+            if model_type == 'seq2seq':
+                # Check for specific models
+                if 'toucan' in model_id.lower():
+                    return 'toucan'
+                elif 'seamless' in model_id.lower() or 'm4t' in model_name.lower():
+                    return 'seamless'
+                else:
+                    return 'nllb'  # Use NLLB as generic seq2seq handler
+            return model_type
+        
+        # Then check model_class in config
+        if model_config and 'model_class' in model_config:
+            model_class = model_config['model_class']
+            
+            # Map model classes to types
+            seq2seq_classes = ['MT5ForConditionalGeneration', 'AutoModelForSeq2SeqLM', 
+                              'M2M100ForConditionalGeneration']
+            if model_class in seq2seq_classes:
+                # Check for specific models first
+                if 'toucan' in model_id.lower() or 'toucan' in model_name.lower():
+                    return 'toucan'
+                elif 'seamless' in model_id.lower() or 'm4t' in model_name.lower():
+                    return 'seamless'
+                else:
+                    return 'nllb'  # Generic seq2seq handler
+        
+        # Finally, try string matching on model_id/model_name
         if 'toucan' in model_id.lower() or 'toucan' in model_name.lower():
             return 'toucan'
         elif 'nllb' in model_id.lower() or 'nllb' in model_name.lower():
             return 'nllb'
         elif 'seamless' in model_id.lower() or 'm4t' in model_name.lower():
             return 'seamless'
+        elif 'madlad' in model_id.lower() or 'madlad' in model_name.lower():
+            return 'nllb'  # Use NLLB handler for MADLAD
         else:
             raise ValueError(f"Cannot determine model type for {model_id} / {model_name}")
     
