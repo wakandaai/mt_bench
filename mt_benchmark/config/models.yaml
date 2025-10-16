@@ -1,91 +1,6 @@
 # mt_benchmark/config/models.yaml
-
+# run specific models with: ./run_batch_eval.sh --models  madlad400_7b toucan_3.7B
 # Toucan Models
-toucan_base:
-  model_name: "UBC-NLP/toucan-base"
-  model_class: "MT5ForConditionalGeneration"
-  torch_dtype: "float16"
-  device_map: "auto"
-  max_input_length: 1024
-  generation_config:
-    num_beams: 5
-    do_sample: true
-    temperature: 0.6
-    top_p: 0.9
-    max_new_tokens: 256
-
-toucan_1.2B:
-  model_name: "UBC-NLP/toucan-1.2B"
-  model_class: "MT5ForConditionalGeneration"
-  torch_dtype: "float16"
-  device_map: "auto"
-  max_input_length: 1024
-  generation_config:
-    num_beams: 5
-    do_sample: true
-    temperature: 0.6
-    top_p: 0.9
-    max_new_tokens: 256
-
-toucan_3.7B:
-  model_name: "UBC-NLP/toucan-3.7B"
-  model_class: "MT5ForConditionalGeneration"
-  torch_dtype: "float16"
-  device_map: "auto"
-  max_input_length: 1024
-  generation_config:
-    num_beams: 5
-    do_sample: true
-    temperature: 0.6
-    top_p: 0.9
-    max_new_tokens: 256
-
-# Seamless Models
-seamless_m4t_v2:
-  model_name: "facebook/seamless-m4t-v2-large"
-  model_id: "seamless"
-  model_class: "SeamlessM4Tv2Model"
-  torch_dtype: "float16"
-  device_map: "auto"
-  max_input_length: 1024
-  generation_config:
-    num_beams: 5
-    max_new_tokens: 256
-
-# NLLB Models
-nllb_200_distilled_600M:
-  model_name: "facebook/nllb-200-distilled-600M"
-  model_class: "NllbModel"
-  torch_dtype: "float16"
-  device_map: "auto"
-  max_input_length: 1024
-  generation_config:
-    num_beams: 4
-    max_new_tokens: 256
-
-nllb_200_3.3B:
-  model_name: "facebook/nllb-200-3.3B"
-  model_class: "NllbModel"
-  torch_dtype: "float16"
-  device_map: "auto"
-  max_input_length: 1024
-  generation_config:
-    num_beams: 4
-    max_new_tokens: 256
-
-afrite_v2_large:
-  model_name: "afrite-ai/afrite-v2-large"
-  model_class: "MT5ForConditionalGeneration"
-  torch_dtype: "float16"
-  device_map: "auto"
-  max_input_length: 1024
-  generation_config:
-    num_beams: 5
-    do_sample: true
-    temperature: 0.6
-    top_p: 0.9
-    max_new_tokens: 256p 
-
 
 madlad400_7b: 
   model_name: "google/madlad400-7b-mt-bt"
@@ -100,6 +15,94 @@ madlad400_7b:
     temperature: 0.6
     top_p: 0.9
     max_new_tokens: 128
+
+toucan_base:
+  model_name: "UBC-NLP/toucan-base"
+  model_class: "MT5ForConditionalGeneration"
+  torch_dtype: "float16"
+  device_map: "auto"
+  max_input_length: 1024
+  generation_config:
+    num_beams: 5
+    do_sample: true
+    temperature: 0.6
+    top_p: 0.9
+    max_new_tokens: 256
+
+# toucan_1.2B:
+#   model_name: "UBC-NLP/toucan-1.2B"
+#   model_class: "MT5ForConditionalGeneration"
+#   torch_dtype: "float16"
+#   device_map: "auto"
+#   max_input_length: 1024
+#   generation_config:
+#     num_beams: 5
+#     do_sample: true
+#     temperature: 0.6
+#     top_p: 0.9
+#     max_new_tokens: 256
+
+
+## interact -p GPU --gres=gpu:v100-32:8 -t 30:00 -A cis250145p
+
+toucan_3.7B:  # Disabled: invalid/ private HF model identifier
+  model_name: "UBC-NLP/toucan-3.7B"
+  model_class: "MT5ForConditionalGeneration"
+  torch_dtype: "float16"
+  device_map: "auto"
+  max_input_length: 1024
+  generation_config:
+    num_beams: 5
+    do_sample: true
+    temperature: 0.6
+    top_p: 0.9
+    max_new_tokens: 256
+
+# # Seamless Models
+# seamless_m4t_v2:
+#   model_name: "facebook/seamless-m4t-v2-large"
+#   model_id: "seamless"
+#   model_class: "SeamlessM4Tv2Model"
+#   torch_dtype: "float16"
+#   device_map: "auto"
+#   max_input_length: 1024
+#   generation_config:
+#     num_beams: 5
+#     max_new_tokens: 256
+
+# # NLLB Models
+# nllb_200_distilled_600M:
+#   model_name: "facebook/nllb-200-distilled-600M"
+#   model_class: "NllbModel"
+#   torch_dtype: "float16"
+#   device_map: "auto"
+#   max_input_length: 1024
+#   generation_config:
+#     num_beams: 4
+#     max_new_tokens: 256
+
+# nllb_200_3.3B:
+#   model_name: "facebook/nllb-200-3.3B"
+#   model_class: "NllbModel"
+#   torch_dtype: "float16"
+#   device_map: "auto"
+#   max_input_length: 1024
+#   generation_config:
+#     num_beams: 4
+#     max_new_tokens: 256
+
+afrite_v2_large:
+  model_name: "afrite-ai/afrite-v2-large"
+  model_class: "MT5ForConditionalGeneration"
+  torch_dtype: "float16"
+  device_map: "auto"
+  max_input_length: 1024
+  generation_config:
+    num_beams: 5
+    do_sample: true
+    temperature: 0.6
+    top_p: 0.9
+    max_new_tokens: 256 
 
 
 # API Models (using DSPy unified interface)
