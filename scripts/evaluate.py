@@ -4,6 +4,9 @@ import sys
 from mt_benchmark.models.factory import ModelFactory
 from mt_benchmark.datasets.flores import FloresDataset
 from mt_benchmark.evaluation.pipeline import EvaluationPipeline
+import torch
+import os
+
 
 def main():
     parser = argparse.ArgumentParser(description='Machine Translation Evaluation Pipeline')
@@ -16,11 +19,14 @@ def main():
                        help='Source language for single pair evaluation (default: fra_Latn)')
     parser.add_argument('--target-lang', default='eng_Latn', 
                        help='Target language for single pair evaluation (default: eng_Latn)')
-    parser.add_argument('--batch-size', type=int, default=16,
+    parser.add_argument('--batch-size', type=int, default=4,
                        help='Batch size for processing (default: 16)')
     
     args = parser.parse_args()
-    
+    torch.cuda.empty_cache()
+        
+    os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
+ 
     try:
         # Load model and dataset
         print(f"Loading model: {args.model_id}")
@@ -33,6 +39,7 @@ def main():
         bleu_config = {"lowercase": False}  # BLEU
         chrf_config = {"word_order": 2}    # chrF++
         
+
         # Create evaluation pipeline
         evaluator = EvaluationPipeline(
             output_dir="results",
